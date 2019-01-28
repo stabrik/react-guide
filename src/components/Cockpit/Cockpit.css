@@ -1,0 +1,10 @@
+.cockpit button{
+    background-color: green;
+    color: white;
+    border: none;
+}
+
+.cockpit button:hover{
+    background-color: lightgreen;
+    color: black;
+}
