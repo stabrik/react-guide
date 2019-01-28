@@ -5,71 +5,77 @@ import Person from './Person/Person.js';
 class App extends Component {
   state = {
     persons: [
-      { name: "Max", age: "28" },
-      { name: "Manu", age: "29" },
-      { name: "Stephanie", age: "26" }
+      {id: "p1", name: "Max", age: "28" },
+      {id: "p2", name: "Manu", age: "29" },
+      {id: "p3", name: "Stephanie", age: "26" }
     ],
     showPerson: false
   }
 
-  nameChangeHandler = (event) => {
-    this.setState({
-      persons: [
-        { name: "Max", age: "28" },
-        { name: event.target.value, age: "29" },
-        { name: "Stephanie", age: "26" }
-      ]
-
-    })
+  nameChangeHandler = (event, id) => {
+    const personIndex = this.state.persons.findIndex( p => { return p.id === id;}); // find index (return number)
+    const person = ( {...this.state.persons[personIndex]} ); // person -> object witch this index
+    person.name = event.target.value; // change name
+    const persons = [...this.state.persons]; // copy all array from state
+    persons[personIndex] = person;
+    this.setState({persons: persons});
   };
-
-  switchNameHandler = (newName) => {
-    //console.log('click');
-    this.setState({
-      persons: [
-        { name: newName, age: "28" },
-        { name: "Manu", age: "29" },
-        { name: "Stephanie", age: "27" }
-
-      ]
-    })
-  }
 
   togglePersonsHandler = () => {
     const doesShow = this.state.showPerson;
     this.setState({ showPerson: !doesShow })
   }
 
+  deletePersonHandler = (indexName) => {
+    //const newPersons = this.state.persons;
+    const newPersons = [...this.state.persons]
+    newPersons.splice(indexName, 1);
+    this.setState({persons: newPersons})
+  }
+
 
   render() {
 
     let person = null;
+    
+    const style = {
+      backgroundColor: "green",
+      color: "white",
+      padding: "8px"
+    }
 
     if (this.state.showPerson) {
       person = (
         <div>
-          <Person
-            name={this.state.persons[0].name}
-            age={this.state.persons[0].age} />
-          <Person
-            name={this.state.persons[1].name}
-            age={this.state.persons[1].age}
-            changed={this.nameChangeHandler}
-            click={this.switchNameHandler.bind(this, 'Max!')}>My Hobbies: Dance</Person>
-          <Person
-            name={this.state.persons[2].name}
-            age={this.state.persons[2].age} />
+          {this.state.persons.map( (p, index) => {
+            return <Person 
+            //below 1 line: I need syntax arrow function -> I need the index which element is for delete
+            click = {() => this.deletePersonHandler(index)}
+            name={p.name} 
+            age={p.age} 
+            key={p.id}
+            changed={(event) => this.nameChangeHandler(event, p.id)} />
+          })}
         </div>
       )
+      style.backgroundColor = "red";
+    }
+
+    let classes = [];
+    if( this.state.persons.length <= 2){
+      classes.push('red');
+    }
+    if( this.state.persons.length <= 1){
+      classes.push('bold');
     }
 
     return (
       <div className="App">
         <h1>Hello React</h1>
-        <button onClick={this.togglePersonsHandler}>Toggle Name</button>
+        <p className={classes.join(' ')}>Change style elements</p>
+        <button style={style} onClick={this.togglePersonsHandler}>Toggle Name</button>
         {person}
       </div>
-
     );
   }
 }
